@@ -5,8 +5,8 @@ using UnityEngine;
 public class MovimentoDoJogador : MonoBehaviour
 {
     [Header("Referências")]
-    private Rigidbody2D oRigidbody2D;
-    private Animator oAnimator;
+    private Rigidbody2D _oRigidbody2D;
+    private Animator _oAnimator;
 
     [Header("Movimento Horizontal")]
     public float velocidadeDoJogador = 9f;
@@ -28,13 +28,13 @@ public class MovimentoDoJogador : MonoBehaviour
     public float tempoDeWallJump = 0.1f;
 
     [Header("Desabilitar controle Temporariamente")]
-    private bool desativarControle = false;
+    private bool _desativarControle = false;
     public float tempoDeDesativarControle = 0.1f;
 
     void Awake()
     {
-        oRigidbody2D = GetComponent<Rigidbody2D>();
-        oAnimator = GetComponent<Animator>();
+        _oRigidbody2D = GetComponent<Rigidbody2D>();
+        _oAnimator = GetComponent<Animator>();
     }
 
     // Start is called before the first frame update
@@ -53,11 +53,11 @@ public class MovimentoDoJogador : MonoBehaviour
 
     private void MovimentarJogador()
     {
-        if (desativarControle == false)
+        if (_desativarControle == false)
         {
             float movimentoHorizontal = Input.GetAxis("Horizontal");
 
-            oRigidbody2D.velocity = new Vector2(movimentoHorizontal * velocidadeDoJogador, oRigidbody2D.velocity.y);
+            _oRigidbody2D.velocity = new Vector2(movimentoHorizontal * velocidadeDoJogador, _oRigidbody2D.velocity.y);
 
             if(movimentoHorizontal > 0)
             {
@@ -70,13 +70,13 @@ public class MovimentoDoJogador : MonoBehaviour
                 indoParaDireita = false;
             }
 
-            if(movimentoHorizontal == 0 && estaNoChao == true)
+            if(movimentoHorizontal == 0 && estaNoChao)
             {
-                oAnimator.Play("jogador-idle");
+                _oAnimator.Play("jogador-idle");
             }
-            else if(movimentoHorizontal != 0 && estaNoChao == true &&estaNaParede == false)
+            else if(movimentoHorizontal != 0 && estaNoChao && estaNaParede == false)
             {
-                oAnimator.Play("jogador-andando");
+                _oAnimator.Play("jogador-andando");
             }
         }
     }
@@ -85,14 +85,14 @@ public class MovimentoDoJogador : MonoBehaviour
     {
         estaNoChao = Physics2D.OverlapCircle(verificadorDeChao.position, tamanhoDoRaioDeVerificacao, layerDoChao);
 
-        if(Input.GetButtonDown("Jump") && estaNoChao)
+        if(Input.GetButtonDown("Jump") && estaNoChao == true)
         {
-            oRigidbody2D.AddForce(new Vector2(0f, alturaDoPulo), ForceMode2D.Impulse);
+            _oRigidbody2D.AddForce(new Vector2(0f, alturaDoPulo), ForceMode2D.Impulse);
         }
 
         if(estaNoChao == false && estaNaParede == false)
         {
-            oAnimator.Play("jogador-pulando");
+            _oAnimator.Play("jogador-pulando");
         }
     }
 
@@ -102,7 +102,7 @@ public class MovimentoDoJogador : MonoBehaviour
 
         if(estaNaParede == true && estaNoChao == false && Input.GetAxis("Horizontal") != 0)
         {
-            oAnimator.Play("jogador-deslizando-na-parede");
+            _oAnimator.Play("jogador-deslizando-na-parede");
         }
 
         if(Input.GetButtonDown("Jump") && estaNaParede == true && estaNoChao == false)
@@ -114,16 +114,16 @@ public class MovimentoDoJogador : MonoBehaviour
         {
             if(indoParaDireita == true)
             {
-                oRigidbody2D.velocity = new Vector2(-forcaXDoWallJump, forcaYDoWallJump);
+                _oRigidbody2D.velocity = new Vector2(-forcaXDoWallJump, forcaYDoWallJump);
             }
             else
             {
-                oRigidbody2D.velocity = new Vector2(forcaXDoWallJump, forcaYDoWallJump);
+                _oRigidbody2D.velocity = new Vector2(forcaXDoWallJump, forcaYDoWallJump);
             }
 
             Invoke(nameof(DeixarEstarPulandoNaParedeComoFalso), tempoDeWallJump);
-            Invoke(nameof(travarControle), tempoDeWallJump);
-            Invoke(nameof(destravarControle), tempoDeWallJump + tempoDeDesativarControle);
+            Invoke(nameof(TravarControle), tempoDeWallJump);
+            Invoke(nameof(DestravarControle), tempoDeWallJump + tempoDeDesativarControle);
         }
         
     }
@@ -133,12 +133,12 @@ public class MovimentoDoJogador : MonoBehaviour
         estaPulandoNaParede = false;
     }
 
-    private void travarControle()
+    private void TravarControle()
     {
-        desativarControle = true;
+        _desativarControle = true;
     }
-    private void destravarControle()
+    private void DestravarControle()
     {
-        desativarControle = false;
+        _desativarControle = false;
     }
 }
